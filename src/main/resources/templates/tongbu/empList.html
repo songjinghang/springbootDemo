@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>empList</title>
+</head>
+<body>
+<a th:href="@{'/tongbu/insertEmp'}">新增</a>
+<table border="1" th:if="${not#lists.isEmpty(empInfo.list)}">
+    <tr>
+        <th>员工ID</th>
+        <th>员工姓名</th>
+        <th>员工年龄</th>
+        <th>员工电话</th>
+        <th>操作</th>
+    </tr>
+    <tr th:each="emp:${empInfo.list}">
+        <td th:text="${emp.employeeId}"></td>
+        <td th:text="${emp.employeeName}"></td>
+        <td th:text="${emp.age}"></td>
+        <td th:text="${emp.phone}"></td>
+        <td>
+            <a th:href="@{'/empTongbu/selectEmployeeById/'+${emp.employeeId}}">修改</a>
+            <a th:href="@{'/empTongbu/deleteEmployee/'+${emp.employeeId}}">删除</a>
+        </td>
+
+    </tr>
+</table>
+</body>
+</html>

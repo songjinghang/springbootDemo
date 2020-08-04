@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>empList</title>
+    <script src="/jquery-2.1.3.js"></script>
+    <script src="/vue.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>-->
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+</head>
+<body>
+vue
+<div id="tabInfo">
+    <input value="新增" @click="insertEmp" type="button"/>
+    <template>
+        <el-table
+                :data="empList"
+                stripe
+                style="width: 100%">
+            <el-table-column prop="employeeId" label="员工ID" width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="employeeName"
+                    label="员工姓名"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="age"
+                    label="员工年龄"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="phone"
+                    label="员工电话"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    label="操作"
+                    width="180">
+                <template slot-scope="scope">
+                    <!--scope是固定的，通过slotscope获取到：row，column， index数据等-->
+                    <el-button type="text" @click="updateEmp(scope.row)">
+                        修改
+                    </el-button>
+                    <el-button type="text" @click="deleteEmp(scope.row)">
+                        删除
+                    </el-button>
+                </template>
+            </el-table-column>
+        </el-table>
+    </template>
+    <!--分页-->
+    <el-pagination
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="page.pageNum"
+            :page-sizes="[2,4,6,8]"
+            :page-size="page.pageSize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="page.total">
+    </el-pagination>
+<!--    <table border="1" width="600px">-->
+<!--        <tr>-->
+<!--            <th>序号</th>-->
+<!--            <th>员工姓名</th>-->
+<!--            <th>员工年龄</th>-->
+<!--            <th>员工电话</th>-->
+<!--            <th>操作</th>-->
+<!--        </tr>-->
+<!--        <tbody id="tbody">-->
+<!--            <tr v-for="(emp,index) in empList">-->
+<!--                <td>{{index+1}}</td>-->
+<!--                <td>{{emp.employeeName}}</td>-->
+<!--                <td>{{emp.age}}</td>-->
+<!--                <td>{{emp.phone}}</td>-->
+<!--                <td>-->
+                    <!--@click==v-on:click-->
+<!--                    <input value="修改" @click="updateEmp(emp)" type="button"/>-->
+<!--                    <input value="删除" @click="deleteEmp(emp)" type="button"/>-->
+<!--                </td>-->
+<!--            </tr>-->
+<!--        </tbody>-->
+<!--    </table>-->
+</div>
+<script>
+    var tabInfo=new Vue({
+        el:"#tabInfo",
+        data:{
+            empList:[],
+            page:{pageNum:1,pageSize:5}
+        },
+        methods:{
+            insertEmp:function() {
+                window.location.href="/vue/insertEmp";
+            },
+            updateEmp:function(emp) {
+                console.log(emp);
+                var employeeId=emp.employeeId;
+                window.location.href="/vue/updateEmp?id="+employeeId;
+            },
+            deleteEmp:function(emp) {
+                console.log(emp);
+                var employeeId=emp.employeeId;
+                var del = confirm("确定要删除吗？");
+                if(del){
+                    $.ajax({
+                        url:"/emp/deleteEmployee/"+employeeId,
+                        data:{},
+                        dataType:"json",
+                        type:"delete",
+                        success:function (data) {
+                            window.location.href="/vue/empList";
+                        }
+                    })
+                }
+            },
+            handleSizeChange:function(val) {
+                console.log('每页'+val+'条');
+                tabInfo.page.pageSize=val;
+                loadPage();
+            },
+            handleCurrentChange:function(val) {
+                console.log('当前页: '+val);
+                tabInfo.page.pageNum=val;
+                loadPage();
+            }
+        }
+    });
+
+    function loadPage(){
+        $.ajax({
+            url:"/emp/selectEmp",
+            data:tabInfo.page,
+            contentType:"application/json",
+            type:"get",
+            dataType:"json",
+            success:function (data) {
+                console.log(data);
+                tabInfo.empList = data.list;
+            }
+        });
+    };
+    loadPage();
+
+</script>
+
+</body>
+</html>

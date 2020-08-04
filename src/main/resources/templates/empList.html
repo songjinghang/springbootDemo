@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>empList</title>
+    <script src="/jquery-2.1.3.js"></script>
+</head>
+<body>
+<input type="button" id="insertBtn" value="新增">
+<table border="1" width="600px">
+    <tr>
+        <th>序号</th>
+        <th>员工姓名</th>
+        <th>员工年龄</th>
+        <th>员工电话</th>
+        <th>操作</th>
+    </tr>
+    <tbody id="tbody">
+
+    </tbody>
+</table>
+
+<script>
+    $.ajax({
+        url:"/emp/selectEmp",
+        data:{pageNum:1,pageSize:20},
+        type:"get",
+        dataType:"json",
+        success:function (data) {
+            console.log(data);
+            var list = data.list
+            for (var i = 0; i < list.length; i++) {
+                var emp = list[i];
+                var html = "<tr>\n" +
+                    "            <td>" + (i+1) + "</td>\n" +
+                    "            <td>" + emp.employeeName + "</td>\n" +
+                    "            <td>" + emp.age + "</td>\n" +
+                    "            <td>" + emp.phone + "</td>\n" +
+                    "            <td>\n" +
+                    "                <button id='" + emp.employeeId + "' class='updateBtn'>修改</button>\n" +
+                    "                <button id='" + emp.employeeId + "' class='deleteBtn'>删除</button>\n" +
+                    "            </td>\n" +
+                    "        </tr>";
+                $("#tbody").append(html);
+            }
+        }
+    });
+
+    $("#insertBtn").click(function () {
+        window.location.href="/insertEmp";
+    });
+
+    //修改
+    $("#tbody").on("click",".updateBtn",function () {
+        var employeeId = this.id;
+        window.location.href="/updateEmp?id="+employeeId;
+    });
+    //删除
+    $("#tbody").on("click",".deleteBtn",function () {
+        var employeeId = this.id;
+        var del = confirm("确定要删除吗？");
+        if(del){
+            $.ajax({
+                url:"/emp/deleteEmployee/"+employeeId,
+                data:{},
+                dataType:"json",
+                type:"delete",
+                success:function (data) {
+                    window.location.href="/empList";
+                }
+            })
+        }
+    });
+</script>
+
+</body>
+</html>
